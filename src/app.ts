@@ -7,6 +7,7 @@ import { addExpense } from './controllers/ExpenseController';
 import { getGroupBalance } from './controllers/BalanceController';
 
 import path from 'path';
+import fs from 'fs';
 
 const app = express();
 app.use(cors());
