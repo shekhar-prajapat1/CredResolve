@@ -1,11 +1,13 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import { initDb } from './config/database';
 import { createUser, createGroup } from './controllers/BaseController';
 import { addExpense } from './controllers/ExpenseController';
 import { getGroupBalance } from './controllers/BalanceController';
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 const PORT = 3000;

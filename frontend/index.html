@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CredResolve UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            perspective: 1200px;
+            /* Prevent horizontal scroll on mobile */
+            width: 100%;
+            position: relative;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.8s ease-out forwards;
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+
+        /* 3D Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease, border-color 0.3s;
+            transform-style: preserve-3d;
+        }
+
+        /* Only hover effects on desktop */
+        @media (min-width: 768px) {
+            .glass-card:hover {
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .glass-card>* {
+            transform: translateZ(20px);
+        }
+
+        /* Inputs & Buttons */
+        .input-field {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            /* Prevents auto-zoom on iOS */
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #d946ef;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 4px rgba(217, 70, 239, 0.1);
+            transform: translateZ(10px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            background-size: 200% 200%;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(30px);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98) translateZ(20px);
+        }
+
+        @media (min-width: 768px) {
+            .btn-primary:hover {
+                background-position: 100% 100%;
+                box-shadow: 0 10px 30px rgba(236, 72, 153, 0.4);
+                transform: translateZ(40px) scale(1.05);
+            }
+        }
+
+        /* Status Alerts */
+        .status-alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            display: none;
+            transform: translateZ(25px);
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        #logOutput::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #logOutput::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #logOutput::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center relative p-4 md:p-8 pb-20">
+
+    <header class="mb-8 md:mb-12 text-center animate-slide-up w-full px-2">
+        <div
+            class="inline-block p-1 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 mb-4 shadow-[0_0_20px_rgba(167,139,250,0.5)]">
+            <div class="bg-slate-900 rounded-full px-4 py-1">
+                <span
+                    class="text-xs font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 uppercase">Assignment
+                    Project</span>
+            </div>
+        </div>
+        <h1 class="text-5xl md:text-7xl font-bold text-white mb-2 tracking-tight drop-shadow-2xl">
+            Cred<span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-400">Resolve</span>
+        </h1>
+        <p class="text-gray-400 text-base md:text-lg">Expense Sharing • Simplified • Efficient</p>
+    </header>
+
+    <main class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 z-10 pb-20 md:pb-16">
+
+        <!-- Create User -->
+        <div class="glass-card p-6 md:p-8 animate-slide-up delay-100">
+            <div class="flex items-center gap-4 mb-6">
+                <div
+                    class="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center text-xl text-violet-300">
+                    👤</div>
+                <h2 class="text-2xl font-bold text-gray-100">Create User</h2>
+            </div>
+
+            <div id="userStatus" class="status-alert"></div>
+
+            <form id="userForm" class="space-y-5">
+                <div class="space-y-1">
+                    <label class="text-sm font-medium text-gray-400 ml-1">Full Name</label>
+                    <input type="text" id="userName" placeholder="e.g. Shekhar"
+                        class="w-full rounded-xl p-3 input-field placeholder-gray-600">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-sm font-medium text-gray-400 ml-1">Email Address</label>
+                    <input type="email" id="userEmail" placeholder="shekhar@example.com"
+                        class="w-full rounded-xl p-3 input-field placeholder-gray-600">
+                </div>
+                <button type="submit"
+                    class="w-full py-3.5 rounded-xl font-bold text-white btn-primary shadow-lg text-lg">
+                    Register User
+                </button>
+            </form>
+        </div>
+
+        <!-- Create Group -->
+        <div class="glass-card p-6 md:p-8 animate-slide-up delay-200">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center text-xl text-pink-300">
+                    👥</div>
+                <h2 class="text-2xl font-bold text-gray-100">Create Group</h2>
+            </div>
+
+            <div id="groupStatus" class="status-alert"></div>
+
+            <form id="groupForm" class="space-y-5">
+                <div class="space-y-1">
+                    <label class="text-sm font-medium text-gray-400 ml-1">Group Name</label>
+                    <input type="text" id="groupName" placeholder="e.g. NIT Warangal Trip"
+                        class="w-full rounded-xl p-3 input-field placeholder-gray-600">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-sm font-medium text-gray-400 ml-1">Member IDs <span
+                            class="text-xs text-gray-500">(comma separated)</span></label>
+                    <input type="text" id="groupMembers" placeholder="e.g. 1, 2, 3"
+                        class="w-full rounded-xl p-3 input-field placeholder-gray-600">
+                </div>
+                <button type="submit"
+                    class="w-full py-3.5 rounded-xl font-bold text-white btn-primary shadow-lg text-lg">
+                    Create Group
+                </button>
+            </form>
+        </div>
+
+        <!-- Add Expense -->
+        <div class="glass-card p-6 md:p-8 md:col-span-2 animate-slide-up delay-300">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center text-xl text-cyan-300">
+                    💸</div>
+                <h2 class="text-2xl font-bold text-gray-100">Add Expense & Check Balance</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Form -->
+                <div>
+                    <div id="expenseStatus" class="status-alert"></div>
+
+                    <form id="expenseForm" class="space-y-5">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="text-sm font-medium text-gray-400 ml-1">Group ID</label>
+                                <input type="number" id="exGroupId" class="w-full rounded-xl p-3 input-field"
+                                    placeholder="ID">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-sm font-medium text-gray-400 ml-1">Payer ID</label>
+                                <input type="number" id="exPayerId" class="w-full rounded-xl p-3 input-field"
+                                    placeholder="ID">
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-400 ml-1">Amount (₹)</label>
+                            <input type="number" id="exAmount"
+                                class="w-full rounded-xl p-3 input-field text-xl font-semibold placeholder-gray-600"
+                                placeholder="0.00">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="text-sm font-medium text-gray-400 ml-1">Split Type</label>
+                                <select id="exSplitType"
+                                    class="w-full rounded-xl p-3 input-field cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center]">
+                                    <option value="EQUAL">Equal</option>
+                                    <option value="EXACT">Exact</option>
+                                    <option value="PERCENTAGE">Percentage</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-sm font-medium text-gray-400 ml-1">Shared With (IDs)</label>
+                                <input type="text" id="exSplitIds" placeholder="1, 2, 3"
+                                    class="w-full rounded-xl p-3 input-field">
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full py-3.5 rounded-xl font-bold text-white btn-primary shadow-lg mt-2 text-lg">
+                            Record Expense
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Logs / Console -->
+                <div
+                    class="glass-card flex flex-col h-[300px] lg:h-auto bg-black/40 rounded-2xl border border-white/5 overflow-hidden shadow-inner mt-4 lg:mt-0">
+                    <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-mono text-gray-400 uppercase tracking-widest">System Log</span>
+                            <div class="flex gap-1.5">
+                                <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                                <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                                <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                            </div>
+                        </div>
+                        <button onclick="clearLogs()"
+                            class="text-[10px] bg-red-500/20 text-red-200 hover:bg-red-500/40 hover:text-white px-2 py-1 rounded transition-colors uppercase font-bold tracking-wider">
+                            Clear
+                        </button>
+                    </div>
+
+                    <div id="logOutput" class="flex-1 p-4 font-mono text-sm text-gray-300 overflow-y-auto space-y-2">
+                        <p class="text-emerald-500">> System initialized.</p>
+                        <p class="opacity-50">> Waiting for input...</p>
+                    </div>
+
+                    <div class="p-4 bg-white/5 border-t border-white/5">
+                        <button onclick="checkBalance()"
+                            class="w-full py-3 rounded-lg border border-violet-500/50 text-violet-300 hover:bg-violet-500 hover:text-white transition-colors text-sm font-bold tracking-wide uppercase">
+                            Calculate Settlement
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer
+        class="fixed bottom-0 w-full p-4 text-center bg-black/90 backdrop-blur-md border-t border-white/5 text-gray-400 text-xs md:text-sm animate-slide-up delay-300 z-50">
+        <p>Developed by <span class="font-bold text-white">Shekhar Prajapat</span> <span class="text-violet-400">(NIT
+                Warangal)</span> 🎓</p>
+    </footer>
+
+    <script>
+        const API = 'http://localhost:3000';
+        const logDiv = document.getElementById('logOutput');
+
+        // Status Helper
+        const showStatus = (elementId, message, type) => {
+            const el = document.getElementById(elementId);
+            el.innerText = message;
+            el.className = `status-alert ${type === 'success' ? 'status-success' : 'status-error'}`;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 4000);
+        };
+
+        const log = (msg, type = 'normal') => {
+            const p = document.createElement('p');
+            p.className = 'animate-[fadeIn_0.3s_ease-out]';
+            if (type === 'error') p.className += ' text-red-400';
+            else if (type === 'success') p.className += ' text-emerald-400';
+            else if (type === 'highlight') p.className += ' text-yellow-300';
+            p.innerText = `> ${msg}`;
+            logDiv.appendChild(p);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        };
+
+        window.clearLogs = () => {
+            logDiv.innerHTML = '<p class="text-emerald-500">> System initialized.</p><p class="opacity-50">> Logs cleared.</p>';
+        };
+
+        // 3D Tilt - DESKTOP ONLY
+        // We disable this on mobile to prevent touch scrolling issues
+        if (window.matchMedia("(min-width: 768px)").matches) {
+            document.querySelectorAll('.glass-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -8;
+                    const rotateY = ((x - centerX) / centerX) * 8;
+                    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+                });
+                card.addEventListener('mouseleave', () => { card.style.transform = 'rotateX(0) rotateY(0) scale(1)'; });
+            });
+        }
+
+        // FORM HANDLERS
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+
+            if (!name || !email) return showStatus('userStatus', 'Name and Email are required!', 'error');
+
+            try {
+                const res = await fetch(`${API}/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email })
+                });
+                const data = await res.json();
+
+                if (res.status !== 201) {
+                    if (data.error && data.error.includes('UNIQUE constraint failed')) {
+                        throw new Error('This Email is already registered!');
+                    }
+                    throw new Error(data.error || 'Failed to create user');
+                }
+
+                showStatus('userStatus', `User "${data.name}" created successfully! ID: ${data.id}`, 'success');
+                log(`User Created: ${data.name} (ID: ${data.id})`, 'success');
+                document.getElementById('userForm').reset();
+            } catch (err) {
+                showStatus('userStatus', err.message, 'error');
+                log(`Error: ${err.message}`, 'error');
+            }
+        });
+
+        document.getElementById('groupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('groupName').value;
+            const idsStr = document.getElementById('groupMembers').value;
+
+            if (!name || !idsStr) return showStatus('groupStatus', 'Group Name and IDs required!', 'error');
+
+            const ids = idsStr.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+
+            try {
+                const res = await fetch(`${API}/groups`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, memberIds: ids })
+                });
+                const data = await res.json();
+
+                if (res.status !== 201) throw new Error(data.error || 'Failed to create group');
+
+                showStatus('groupStatus', `Group "${data.group.name}" created successfully! ID: ${data.group.id}`, 'success');
+                log(`Group Created: ${data.group.name} (ID: ${data.group.id})`, 'success');
+                document.getElementById('groupForm').reset();
+            } catch (err) {
+                showStatus('groupStatus', err.message, 'error');
+                log(`Error: ${err.message}`, 'error');
+            }
+        });
+
+        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const groupId = parseInt(document.getElementById('exGroupId').value);
+            const payerId = parseInt(document.getElementById('exPayerId').value);
+            const amount = parseFloat(document.getElementById('exAmount').value);
+            const splitType = document.getElementById('exSplitType').value;
+            const userIds = document.getElementById('exSplitIds').value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+
+            if (!groupId || !payerId || !amount || userIds.length === 0)
+                return showStatus('expenseStatus', 'Please fill all expense fields correctly.', 'error');
+
+            let splits = [];
+
+            if (splitType === 'EQUAL') {
+                splits = userIds.map(id => ({ userId: id }));
+            }
+            else if (splitType === 'EXACT') {
+                for (let id of userIds) {
+                    const share = prompt(`Enter EXACT Amount for User ID ${id}:`);
+                    if (!share) return showStatus('expenseStatus', 'Action Cancelled: Amount missing', 'error');
+                    splits.push({ userId: id, amount: parseFloat(share) });
+                }
+            }
+            else if (splitType === 'PERCENTAGE') {
+                for (let id of userIds) {
+                    const share = prompt(`Enter % Percentage for User ID ${id} (0-100):`);
+                    if (!share) return showStatus('expenseStatus', 'Action Cancelled: Percentage missing', 'error');
+                    splits.push({ userId: id, percentage: parseFloat(share) });
+                }
+            }
+
+            try {
+                const res = await fetch(`${API}/expenses`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        groupId, payerId, amount, description: 'UI Expense',
+                        splitType, splits
+                    })
+                });
+                const data = await res.json();
+
+                if (res.status !== 201) throw new Error(data.error || 'Failed to add expense');
+
+                showStatus('expenseStatus', `Expense of ₹${amount} Added Successfully! ID: ${data.expenseId}`, 'success');
+                log(`Expense Added! ID: ${data.expenseId}`, 'success');
+                document.getElementById('expenseForm').reset();
+            } catch (err) {
+                showStatus('expenseStatus', err.message, 'error');
+                log(`Error: ${err.message}`, 'error');
+            }
+        });
+
+        window.checkBalance = async () => {
+            const groupId = document.getElementById('exGroupId').value;
+            if (!groupId) return showStatus('expenseStatus', 'Enter Group ID to check balance', 'error');
+
+            try {
+                const res = await fetch(`${API}/groups/${groupId}/balance`);
+                const data = await res.json();
+
+                log('--- S U M M A R Y ---', 'highlight');
+                if (data.transactions.length === 0) log('All settled up! No debts.', 'success');
+                data.transactions.forEach(t => {
+                    log(`User ${t.from} pays User ${t.to}: ₹${t.amount}`, 'success');
+                });
+                log('-----------------------', 'highlight');
+            } catch (err) {
+                log(`Error: ${err.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>
