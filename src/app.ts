@@ -6,11 +6,16 @@ import { createUser, createGroup } from './controllers/BaseController';
 import { addExpense } from './controllers/ExpenseController';
 import { getGroupBalance } from './controllers/BalanceController';
 
+import path from 'path';
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const PORT = 3000;
+// Serve Static Frontend
+app.use(express.static(path.join(__dirname, '../../frontend')));
+
+const PORT = process.env.PORT || 3000;
 
 // Initialize DB
 initDb().then(() => {
@@ -20,9 +25,7 @@ initDb().then(() => {
 });
 
 // Routes
-app.get('/', (req, res) => {
-    res.send('<h1>Expense Sharing API is running</h1><p>Try POST /users, /groups, /expenses</p>');
-});
+// Note: We remove the root '/' route so index.html is served instead
 app.post('/users', createUser);
 app.post('/groups', createGroup);
 app.post('/expenses', addExpense);
