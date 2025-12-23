@@ -2,7 +2,23 @@
     "version": 2,
     "rewrites": [
         {
-            "source": "/(.*)",
+            "source": "/products",
+            "destination": "/api/index.ts"
+        },
+        {
+            "source": "/users",
+            "destination": "/api/index.ts"
+        },
+        {
+            "source": "/groups",
+            "destination": "/api/index.ts"
+        },
+        {
+            "source": "/expenses",
+            "destination": "/api/index.ts"
+        },
+        {
+            "source": "/groups/(.*)",
             "destination": "/api/index.ts"
         }
     ]
