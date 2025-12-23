@@ -12,8 +12,8 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Serve Static Frontend
-app.use(express.static(path.join(__dirname, '../../frontend')));
+// Serve Static Frontend (for Local Dev)
+app.use(express.static(path.join(__dirname, '../../public')));
 
 const PORT = process.env.PORT || 3000;
 
