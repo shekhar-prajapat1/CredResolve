@@ -1,20 +1,28 @@
 import sqlite3 from 'sqlite3';
 import { open, Database } from 'sqlite';
 
+import path from 'path';
+import fs from 'fs';
+
+// Vercel only allows writing to /tmp
+const dbPath = process.env.VERCEL
+  ? path.join('/tmp', 'database.sqlite')
+  : './database.sqlite';
+
 const dbPromise = open({
-    filename: './database.sqlite',
-    driver: sqlite3.Database
+  filename: dbPath,
+  driver: sqlite3.Database
 });
 
 export const getDb = async (): Promise<Database> => {
-    return dbPromise;
+  return dbPromise;
 };
 
 export const initDb = async () => {
-    const db = await getDb();
-    await db.exec('PRAGMA foreign_keys = ON;');
+  const db = await getDb();
+  await db.exec('PRAGMA foreign_keys = ON;');
 
-    await db.exec(`
+  await db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -57,5 +65,5 @@ export const initDb = async () => {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
   `);
-    console.log('Database initialized');
+  console.log('Database initialized');
 };

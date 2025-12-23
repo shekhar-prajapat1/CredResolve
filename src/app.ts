@@ -31,8 +31,11 @@ app.post('/groups', createGroup);
 app.post('/expenses', addExpense);
 app.get('/groups/:id/balance', getGroupBalance);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Only listen if run directly (not imported)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+    });
+}
 
 export default app;
