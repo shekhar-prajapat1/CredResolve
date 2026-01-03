@@ -1,5 +1,4 @@
-# Expense Sharing Application
-
+# Expense Sharing Application CredResolve assignment
 A backend system for an expense sharing application (similar to Splitwise) built with Node.js, TypeScript, and SQLite.
 
 ## 🎯 Objective
